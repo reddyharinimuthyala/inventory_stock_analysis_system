@@ -1,0 +1,7 @@
+body { background: #f5f7fb; color: #202733; }
+.navbar-brand { font-weight: 700; letter-spacing: .3px; }
+.card { border: 0; border-radius: 14px; box-shadow: 0 4px 18px rgba(30, 45, 70, .06); }
+.metric { height: 100%; }
+.metric .display-6 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 650; overflow-wrap: anywhere; }
+.table { vertical-align: middle; }
+footer { font-size: .9rem; }

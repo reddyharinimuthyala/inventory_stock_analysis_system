@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Products · StockWise{% endblock %}
+{% block content %}
+<h1 class="h2 mb-3">Products</h1>
+<div class="card mb-4"><div class="card-body">
+  <h2 class="h5">Add a product</h2>
+  <form method="post" class="row g-3">
+    <div class="col-md-2"><label class="form-label">SKU *</label><input class="form-control" name="sku" required></div>
+    <div class="col-md-3"><label class="form-label">Product name *</label><input class="form-control" name="product_name" required></div>
+    <div class="col-md-2"><label class="form-label">Category</label><input class="form-control" name="category" value="General"></div>
+    <div class="col-md-2"><label class="form-label">Opening stock</label><input class="form-control" type="number" min="0" name="opening_stock" value="0" required></div>
+    <div class="col-md-1"><label class="form-label">Reorder</label><input class="form-control" type="number" min="0" name="reorder_level" value="5" required></div>
+    <div class="col-md-2"><label class="form-label">Unit cost (₹)</label><input class="form-control" type="number" min="0" step="0.01" name="unit_cost" value="0.00" required></div>
+    <div class="col-12"><button class="btn btn-primary">Add product</button></div>
+  </form>
+</div></div>
+<div class="card"><div class="card-body"><h2 class="h5">Product list</h2>
+<div class="table-responsive"><table class="table table-hover">
+<thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Opening</th><th>Current</th><th>Reorder level</th><th>Unit cost</th><th>Value</th></tr></thead>
+<tbody>{% for p in products %}<tr class="{% if p.current_stock <= p.reorder_level %}table-warning{% endif %}">
+<td>{{ p.sku }}</td><td>{{ p.product_name }}</td><td>{{ p.category }}</td><td>{{ p.opening_stock }}</td><td>{{ p.current_stock }}</td><td>{{ p.reorder_level }}</td><td>₹{{ "%.2f"|format(p.unit_cost) }}</td><td>₹{{ "%.2f"|format(p.stock_value) }}</td>
+</tr>{% else %}<tr><td colspan="8" class="text-center text-muted">No products added yet.</td></tr>{% endfor %}</tbody>
+</table></div></div></div>
+{% endblock %}

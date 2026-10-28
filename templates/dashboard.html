@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · StockWise{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div><h1 class="h2 mb-1">Inventory Dashboard</h1><p class="text-muted mb-0">A quick view of stock and inventory health.</p></div>
+  <a class="btn btn-primary" href="{{ url_for('transactions') }}">Record movement</a>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card metric"><div class="card-body"><div class="text-muted">Products</div><div class="display-6">{{ total_products }}</div></div></div></div>
+  <div class="col-md-4"><div class="card metric"><div class="card-body"><div class="text-muted">Units in stock</div><div class="display-6">{{ total_units }}</div></div></div></div>
+  <div class="col-md-4"><div class="card metric"><div class="card-body"><div class="text-muted">Estimated inventory value</div><div class="display-6">₹{{ "%.2f"|format(inventory_value) }}</div></div></div></div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card"><div class="card-body">
+      <h2 class="h5">Stock levels</h2>
+      <img class="img-fluid" src="{{ url_for('stock_chart') }}" alt="Current stock compared with reorder levels">
+    </div></div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card"><div class="card-body">
+      <h2 class="h5">Low-stock items <span class="badge bg-danger">{{ low_stock|length }}</span></h2>
+      {% if low_stock %}
+      <ul class="list-group list-group-flush">
+        {% for p in low_stock %}
+        <li class="list-group-item d-flex justify-content-between"><span>{{ p.product_name }}<small class="d-block text-muted">{{ p.sku }}</small></span><span class="badge bg-warning text-dark align-self-center">{{ p.current_stock }} / {{ p.reorder_level }}</span></li>
+        {% endfor %}
+      </ul>
+      {% else %}<p class="text-success mb-0">No products are below their reorder threshold.</p>{% endif %}
+    </div></div>
+  </div>
+</div>
+<div class="card mt-4"><div class="card-body">
+  <h2 class="h5">Recent transactions</h2>
+  {% if recent %}
+  <div class="table-responsive"><table class="table table-striped align-middle">
+    <thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Qty</th><th>Supplier</th></tr></thead>
+    <tbody>{% for t in recent %}<tr><td>{{ t.transaction_date.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ t.product.product_name }}</td><td>{{ t.transaction_type }}</td><td>{{ t.quantity }}</td><td>{{ t.supplier.supplier_name if t.supplier else '—' }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="text-muted mb-0">No stock movements recorded yet.</p>{% endif %}
+</div></div>
+{% endblock %}

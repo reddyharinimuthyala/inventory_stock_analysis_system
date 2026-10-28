@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Transactions · StockWise{% endblock %}
+{% block content %}
+<h1 class="h2 mb-3">Stock transactions</h1>
+<div class="alert alert-info">Stock IN increases quantity. Stock OUT decreases quantity. Adjustments are also logged and cannot reduce stock below zero.</div>
+<div class="card mb-4"><div class="card-body"><h2 class="h5">Record a movement</h2>
+{% if products %}
+<form method="post" class="row g-3">
+  <div class="col-md-3"><label class="form-label">Product *</label><select class="form-select" name="product_id" required><option value="">Choose product</option>{% for p in products %}<option value="{{ p.product_id }}">{{ p.sku }} — {{ p.product_name }} (stock: {{ p.current_stock }})</option>{% endfor %}</select></div>
+  <div class="col-md-2"><label class="form-label">Type *</label><select class="form-select" name="transaction_type" required><option value="IN">Stock IN</option><option value="OUT">Stock OUT</option><option value="ADJUSTMENT_IN">Adjustment IN</option><option value="ADJUSTMENT_OUT">Adjustment OUT</option></select></div>
+  <div class="col-md-2"><label class="form-label">Quantity *</label><input class="form-control" type="number" min="1" name="quantity" required></div>
+  <div class="col-md-2"><label class="form-label">Supplier</label><select class="form-select" name="supplier_id"><option value="">Not specified</option>{% for s in suppliers %}<option value="{{ s.supplier_id }}">{{ s.supplier_name }}</option>{% endfor %}</select></div>
+  <div class="col-md-3"><label class="form-label">Date/time (optional)</label><input class="form-control" type="datetime-local" name="transaction_date"></div>
+  <div class="col-12"><label class="form-label">Notes</label><input class="form-control" name="notes" maxlength="500" placeholder="Invoice, reason for adjustment, etc."></div>
+  <div class="col-12"><button class="btn btn-primary">Save transaction</button></div>
+</form>
+{% else %}<p class="mb-0">Add a product before recording transactions.</p>{% endif %}
+</div></div>
+<div class="card"><div class="card-body"><h2 class="h5">Latest 100 transactions</h2>
+<div class="table-responsive"><table class="table table-striped"><thead><tr><th>ID</th><th>Date</th><th>Product</th><th>Type</th><th>Quantity</th><th>Supplier</th><th>Notes</th></tr></thead><tbody>
+{% for t in transactions %}<tr><td>{{ t.transaction_id }}</td><td>{{ t.transaction_date.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ t.product.product_name }}</td><td>{{ t.transaction_type }}</td><td>{{ t.quantity }}</td><td>{{ t.supplier.supplier_name if t.supplier else '—' }}</td><td>{{ t.notes or '—' }}</td></tr>
+{% else %}<tr><td colspan="7" class="text-center text-muted">No transactions yet.</td></tr>{% endfor %}
+</tbody></table></div></div></div>
+{% endblock %}

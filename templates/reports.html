@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Reports · StockWise{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div><h1 class="h2 mb-1">Inventory reports</h1><p class="text-muted mb-0">Calculated from opening stock and transaction history.</p></div>
+  <a class="btn btn-outline-primary" href="{{ url_for('movement_csv') }}">Download CSV</a>
+</div>
+<div class="card mb-4"><div class="card-body"><h2 class="h5">Current stock vs reorder level</h2><img class="img-fluid" src="{{ url_for('stock_chart') }}" alt="Stock chart"></div></div>
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card metric"><div class="card-body"><div class="text-muted">Estimated inventory value</div><div class="display-6">₹{{ "%.2f"|format(total_value) }}</div></div></div></div>
+  <div class="col-md-4"><div class="card metric"><div class="card-body"><div class="text-muted">Products needing reorder</div><div class="display-6">{{ low_stock|length }}</div></div></div></div>
+</div>
+<div class="card mb-4"><div class="card-body"><h2 class="h5">Low-stock list</h2>
+{% if low_stock %}<div class="table-responsive"><table class="table table-warning"><thead><tr><th>SKU</th><th>Product</th><th>Current</th><th>Reorder level</th></tr></thead><tbody>{% for r in low_stock %}<tr><td>{{ r.SKU }}</td><td>{{ r.Product }}</td><td>{{ r['Current Stock'] }}</td><td>{{ r['Reorder Level'] }}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="text-success mb-0">No items need reordering.</p>{% endif %}
+</div></div>
+<div class="card"><div class="card-body"><h2 class="h5">Stock movement and valuation</h2>
+<div class="table-responsive"><table class="table table-striped"><thead><tr><th>SKU</th><th>Product</th><th>Opening</th><th>Stock in</th><th>Stock out</th><th>Current</th><th>Reorder</th><th>Unit cost</th><th>Value</th><th>Status</th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r.SKU }}</td><td>{{ r.Product }}</td><td>{{ r['Opening Stock'] }}</td><td>{{ r['Stock In'] }}</td><td>{{ r['Stock Out'] }}</td><td>{{ r['Current Stock'] }}</td><td>{{ r['Reorder Level'] }}</td><td>₹{{ "%.2f"|format(r['Unit Cost']) }}</td><td>₹{{ "%.2f"|format(r['Stock Value']) }}</td><td>{% if r['Current Stock'] <= r['Reorder Level'] %}<span class="badge bg-danger">REORDER</span>{% else %}<span class="badge bg-success">OK</span>{% endif %}</td></tr>
+{% else %}<tr><td colspan="10" class="text-center text-muted">Add products to generate a report.</td></tr>{% endfor %}
+</tbody></table></div></div></div>
+{% endblock %}
